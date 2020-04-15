@@ -1,2 +1,3 @@
-# tootkit
-Mastodon library
+# TootKit
+
+A description of this package.
