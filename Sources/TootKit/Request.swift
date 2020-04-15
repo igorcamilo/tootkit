@@ -13,7 +13,7 @@ enum Request {
 
 extension Request {
     func urlRequest(with client: Client) -> URLRequest {
-        var urlRequest = URLRequest(url: client.baseURL)
+        var urlRequest = URLRequest(url: client.baseURL.appendingPathComponent("api/v1"))
         switch self {
         case .publicTimeline:
             urlRequest.url?.appendPathComponent("timelines/public")

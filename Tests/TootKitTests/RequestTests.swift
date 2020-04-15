@@ -9,15 +9,13 @@ import XCTest
 @testable import TootKit
 
 final class RequestTests: XCTestCase {
-    func testURLRequest() {
-        guard let baseURL =  URL(string: "toot://localhost") else {
-            XCTFail("Can't create base URL")
-            return
-        }
-        let client = Client(baseURL: baseURL)
+    private func urlRequest(with request: Request) -> URLRequest {
+        request.urlRequest(with: Client(baseURL: URL(string: "toot://localhost")!))
+    }
 
-        let publicTimelineURLRequest = Request.publicTimeline.urlRequest(with: client)
-        XCTAssertEqual(publicTimelineURLRequest.url, URL(string: "toot://localhost/timelines/public"))
-        XCTAssertEqual(publicTimelineURLRequest.httpMethod, "GET")
+    func testPublicTimeline() {
+        let urlRequest = self.urlRequest(with: .publicTimeline)
+        XCTAssertEqual(urlRequest.url?.absoluteString, "toot://localhost/api/v1/timelines/public")
+        XCTAssertEqual(urlRequest.httpMethod, "GET")
     }
 }
