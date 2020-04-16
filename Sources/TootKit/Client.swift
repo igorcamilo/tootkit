@@ -16,24 +16,32 @@ public final class Client {
     }
 
     private func dataTask<T: Decodable>(request: Request, completionHandler: @escaping (Result<T, Error>) -> Void) {
-        URLSession.shared.dataTask(with: request.urlRequest(with: self)) {
-            do {
-                let data = try validate(data: $0, response: $1, error: $2)
-                let value = try globalDecoder.decode(T.self, from: data)
-                completionHandler(.success(value))
-            } catch {
-                completionHandler(.failure(error))
-            }
-        }.resume()
+        do {
+            try URLSession.shared.dataTask(with: request.urlRequest(with: self)) {
+                do {
+                    let data = try validate(data: $0, response: $1, error: $2)
+                    let value = try globalDecoder.decode(T.self, from: data)
+                    completionHandler(.success(value))
+                } catch {
+                    completionHandler(.failure(error))
+                }
+            }.resume()
+        } catch {
+            completionHandler(.failure(error))
+        }
     }
 
     @available(OSX 10.15, *)
     private func dataTaskPublisher<T: Decodable>(request: Request) -> AnyPublisher<T, Error> {
-        URLSession.shared
-            .dataTaskPublisher(for: request.urlRequest(with: self))
-            .tryMap { try validate($0) }
-            .decode(type: T.self, decoder: globalDecoder)
-            .eraseToAnyPublisher()
+        do {
+            return try URLSession.shared
+                .dataTaskPublisher(for: request.urlRequest(with: self))
+                .tryMap { try validate($0) }
+                .decode(type: T.self, decoder: globalDecoder)
+                .eraseToAnyPublisher()
+        } catch {
+            return Fail(error: error).eraseToAnyPublisher()
+        }
     }
 }
 

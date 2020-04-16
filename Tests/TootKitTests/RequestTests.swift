@@ -9,12 +9,10 @@ import XCTest
 @testable import TootKit
 
 final class RequestTests: XCTestCase {
-    private func urlRequest(with request: Request) -> URLRequest {
-        request.urlRequest(with: Client(baseURL: URL(string: "toot://localhost")!))
-    }
+    private func urlRequest(with request: Request) throws -> URLRequest { try request.urlRequest(with: .test()) }
 
-    func testPublicTimeline() {
-        let urlRequest = self.urlRequest(with: .publicTimeline)
+    func testPublicTimeline() throws {
+        let urlRequest = try self.urlRequest(with: .publicTimeline)
         XCTAssertEqual(urlRequest.url?.absoluteString, "toot://localhost/api/v1/timelines/public")
         XCTAssertEqual(urlRequest.httpMethod, "GET")
     }
